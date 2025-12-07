@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use Closure;
 use Exception;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
@@ -271,7 +272,8 @@ class FilamentInput
                     ->downloadable()
                     ->rules($setting->validation ?? []);
 
-                $maxFileSize = $setting->max_size ?? self::getUploadLimitKilobytes();
+                $maxFileSize = self::resolveMaxFileSizeKilobytes($setting->max_size ?? null);
+
                 if ($maxFileSize) {
                     $input->maxSize($maxFileSize);
                 }
@@ -340,6 +342,24 @@ class FilamentInput
             'K', 'KB', '' => $value,
             default => null,
         };
+    }
+
+    private static function resolveMaxFileSizeKilobytes(mixed $maxSize): ?int
+    {
+        $configuredLimit = match (true) {
+            $maxSize instanceof Closure => $maxSize(),
+            is_string($maxSize) => self::convertToKilobytes($maxSize) ?? (is_numeric($maxSize) ? (int) $maxSize : null),
+            is_int($maxSize) => $maxSize,
+            default => null,
+        };
+
+        $phpLimit = self::getUploadLimitKilobytes();
+
+        if ($configuredLimit && $phpLimit) {
+            return min($configuredLimit, $phpLimit);
+        }
+
+        return $configuredLimit ?? $phpLimit;
     }
 
     private static function getUploadLimitKilobytes(): ?int
