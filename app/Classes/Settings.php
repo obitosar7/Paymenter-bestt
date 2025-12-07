@@ -75,6 +75,7 @@ class Settings
                     'required' => false,
                     'accept' => ['image/*'],
                     'file_name' => 'logo-light.webp',
+                    'max_size' => '12MB',
                     'description' => 'Upload a logo to be displayed on light backgrounds.',
                 ],
                 [
@@ -84,6 +85,7 @@ class Settings
                     'required' => false,
                     'accept' => ['image/*'],
                     'file_name' => 'logo-dark.webp',
+                    'max_size' => '12MB',
                     'description' => 'Upload a logo to be displayed on dark backgrounds.',
                 ],
                 [
@@ -93,6 +95,7 @@ class Settings
                     'required' => false,
                     'accept' => ['image/x-icon', 'image/png', 'image/svg+xml'],
                     'file_name' => 'favicon.ico',
+                    'max_size' => '12MB',
                     'description' => 'Upload a .ico, .png, or .svg file to be used as the browser icon.',
                 ],
                 [
