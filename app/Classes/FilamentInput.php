@@ -329,11 +329,18 @@ class FilamentInput
 
     private static function convertToKilobytes(string $size): ?int
     {
+        $size = trim($size);
+
         if ($size === '') {
             return null;
         }
 
         $value = (int) $size;
+
+        if ($value <= 0) {
+            return null;
+        }
+
         $unit = Str::upper(trim(Str::after((string) $size, (string) $value)));
 
         return match ($unit) {
@@ -348,8 +355,12 @@ class FilamentInput
     {
         $configuredLimit = match (true) {
             $maxSize instanceof Closure => $maxSize(),
-            is_string($maxSize) => self::convertToKilobytes($maxSize) ?? (is_numeric($maxSize) ? (int) $maxSize : null),
-            is_int($maxSize) => $maxSize,
+            default => $maxSize,
+        };
+
+        $configuredLimit = match (true) {
+            is_string($configuredLimit) => self::convertToKilobytes($configuredLimit) ?? (is_numeric($configuredLimit) ? (int) $configuredLimit : null),
+            is_int($configuredLimit) && $configuredLimit > 0 => $configuredLimit,
             default => null,
         };
 
