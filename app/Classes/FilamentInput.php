@@ -13,6 +13,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Spatie\Color\Factory as ColorFactory;
 
 class FilamentInput
@@ -271,7 +272,20 @@ class FilamentInput
 
                 if (isset($setting->file_name)) {
                     $input->getUploadedFileNameForStorageUsing(
-                        fn ($file): string => (string) $setting->file_name,
+                        function (TemporaryUploadedFile $file) use ($setting): string {
+                            $fileName = $setting->file_name;
+
+                            if (is_callable($fileName)) {
+                                $fileName = $fileName($file);
+                            }
+
+                            if (is_string($fileName) && str_contains($fileName, '{extension}')) {
+                                $extension = $file->getClientOriginalExtension() ?: $file->getExtension();
+                                $fileName = str_replace('{extension}', $extension, $fileName);
+                            }
+
+                            return (string) $fileName;
+                        },
                     );
                 }
 
