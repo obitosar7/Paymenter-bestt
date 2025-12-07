@@ -13,6 +13,8 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Spatie\Color\Factory as ColorFactory;
 
 class FilamentInput
@@ -269,9 +271,27 @@ class FilamentInput
                     ->downloadable()
                     ->rules($setting->validation ?? []);
 
+                $maxFileSize = $setting->max_size ?? self::getUploadLimitKilobytes();
+                if ($maxFileSize) {
+                    $input->maxSize($maxFileSize);
+                }
+
                 if (isset($setting->file_name)) {
                     $input->getUploadedFileNameForStorageUsing(
-                        fn (): string => (string) $setting->file_name,
+                        function (TemporaryUploadedFile $file) use ($setting): string {
+                            $fileName = $setting->file_name;
+
+                            if (is_callable($fileName)) {
+                                $fileName = $fileName($file);
+                            }
+
+                            if (is_string($fileName) && str_contains($fileName, '{extension}')) {
+                                $extension = $file->getClientOriginalExtension() ?: $file->getExtension();
+                                $fileName = str_replace('{extension}', $extension, $fileName);
+                            }
+
+                            return (string) $fileName;
+                        },
                     );
                 }
 
@@ -303,5 +323,32 @@ class FilamentInput
             default:
                 throw new Exception("Unknown input type: {$setting->type}");
         }
+    }
+
+    private static function convertToKilobytes(string $size): ?int
+    {
+        if ($size === '') {
+            return null;
+        }
+
+        $value = (int) $size;
+        $unit = Str::upper(trim(Str::after((string) $size, (string) $value)));
+
+        return match ($unit) {
+            'G', 'GB' => $value * 1024 * 1024,
+            'M', 'MB' => $value * 1024,
+            'K', 'KB', '' => $value,
+            default => null,
+        };
+    }
+
+    private static function getUploadLimitKilobytes(): ?int
+    {
+        $uploadMax = self::convertToKilobytes((string) ini_get('upload_max_filesize'));
+        $postMax = self::convertToKilobytes((string) ini_get('post_max_size'));
+
+        $limits = array_filter([$uploadMax, $postMax]);
+
+        return empty($limits) ? null : min($limits);
     }
 }
