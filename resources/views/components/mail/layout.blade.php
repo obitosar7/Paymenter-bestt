@@ -101,19 +101,22 @@
         .brand .logo-slot {
             display: grid;
             place-items: center;
-            width: 54px;
-            height: 54px;
+            width: 56px;
+            height: 56px;
             border-radius: 16px;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.22));
+            background: radial-gradient(circle at 24% 24%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.24)),
+                        linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(124, 58, 237, 0.28));
             box-shadow: 0 10px 28px rgba(79, 70, 229, 0.28);
             padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        .brand .logo-slot img {
-            max-height: 40px;
+        .brand .logo-slot img,
+        .footer .brandmark img {
+            max-height: 44px;
             max-width: 100%;
             object-fit: contain;
-            border-radius: 10px;
+            border-radius: 12px;
         }
 
         .brand .logo-slot p {
@@ -128,7 +131,7 @@
         .brand .logo-fallback {
             width: 100%;
             height: 100%;
-            border-radius: 12px;
+            border-radius: 14px;
             background: linear-gradient(140deg, var(--brand-start), var(--brand-end));
             display: grid;
             place-items: center;
@@ -294,7 +297,7 @@
         .footer .brandmark {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-weight: 700;
             color: #e0e7ff;
         }
@@ -336,7 +339,7 @@
                             @if($header)
                                 {!! Illuminate\View\Compilers\BladeCompiler::render($header) !!}
                             @else
-                                <div class="logo-fallback">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($appName, 0, 2)) }}</div>
+                                <img src="https://i.ibb.co/kVgQNsXp/image.png" alt="{{ $appName }}" loading="lazy">
                             @endif
                         </div>
                         <span>{{ $appName }}</span>
@@ -358,7 +361,10 @@
                 @if($footer)
                     {!! Illuminate\View\Compilers\BladeCompiler::render($footer) !!}
                 @else
-                    <div class="brandmark">{{ $appName }}</div>
+                    <div class="brandmark">
+                        <img src="https://i.ibb.co/kVgQNsXp/image.png" alt="{{ $appName }}" loading="lazy">
+                        <span>{{ $appName }}</span>
+                    </div>
                     <div style="margin-top:6px;">© {{ date('Y') }} {{ $appName }}. All rights reserved.</div>
                 @endif
             </div>
