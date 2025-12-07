@@ -62,7 +62,9 @@
         }
 
         .header {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.18));
+            background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.18), transparent 52%),
+                        radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.18), transparent 46%),
+                        linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(124, 58, 237, 0.22));
             padding: 26px 32px 20px;
             position: relative;
         }
@@ -72,7 +74,7 @@
             position: absolute;
             inset: 12px 18px 10px;
             border-radius: 16px;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.12));
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.16));
             filter: blur(12px);
             z-index: 0;
         }
@@ -96,16 +98,43 @@
             letter-spacing: -0.3px;
         }
 
-        .brand .badge {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
+        .brand .logo-slot {
+            display: grid;
+            place-items: center;
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.22));
+            box-shadow: 0 10px 28px rgba(79, 70, 229, 0.28);
+            padding: 6px;
+        }
+
+        .brand .logo-slot img {
+            max-height: 40px;
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .brand .logo-slot p {
+            margin: 0;
+        }
+
+        .brand .logo-slot svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .brand .logo-fallback {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
             background: linear-gradient(140deg, var(--brand-start), var(--brand-end));
-            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
             display: grid;
             place-items: center;
             color: #ffffff;
             font-size: 18px;
+            letter-spacing: 0.5px;
         }
 
         .meta-pill {
@@ -259,6 +288,7 @@
             color: #cbd5e1;
             font-size: 13px;
             line-height: 1.6;
+            text-align: center;
         }
 
         .footer .brandmark {
@@ -302,7 +332,13 @@
             <div class="header">
                 <div class="brand-row">
                     <div class="brand">
-                        <span class="badge">✦</span>
+                        <div class="logo-slot">
+                            @if($header)
+                                {!! Illuminate\View\Compilers\BladeCompiler::render($header) !!}
+                            @else
+                                <div class="logo-fallback">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($appName, 0, 2)) }}</div>
+                            @endif
+                        </div>
                         <span>{{ $appName }}</span>
                     </div>
                     <div class="meta-pill">Account updates · Secure &amp; reliable</div>
@@ -310,12 +346,6 @@
 
                 <div class="eyebrow">Stay in control</div>
                 <h1 class="strapline">Beautifully crafted notifications for {{ $appName }}</h1>
-
-                @if($header)
-                    <div style="margin-top:12px; font-size:14px; line-height:1.7; color:#1f2937; position:relative; z-index:1;">
-                        {!! Illuminate\View\Compilers\BladeCompiler::render($header) !!}
-                    </div>
-                @endif
             </div>
 
             <div class="content">
@@ -328,8 +358,8 @@
                 @if($footer)
                     {!! Illuminate\View\Compilers\BladeCompiler::render($footer) !!}
                 @else
-                    <div class="brandmark">{{ $appName }} · Crafted with care</div>
-                    <div style="margin-top:6px;">You are receiving this email to stay up to date with important activity.</div>
+                    <div class="brandmark">{{ $appName }}</div>
+                    <div style="margin-top:6px;">© {{ date('Y') }} {{ $appName }}. All rights reserved.</div>
                 @endif
             </div>
         </div>
